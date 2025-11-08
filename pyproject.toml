@@ -1,15 +1,12 @@
 [project]
-name = "project1-байков-максим-м25-555"
+name = "project1-baikov-maksim-m25-555"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "lYoungunl",email = "max10129595@mail.ru"}
+    {name = "lYoungunl", email = "max10129595@mail.ru"}
 ]
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
