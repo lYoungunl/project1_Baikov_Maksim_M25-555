@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from .constants import ROOMS
-from .utils import describe_current_room
+from .utils import describe_current_room, random_event
 
 
 def get_input(prompt="> "):
@@ -11,12 +11,14 @@ def get_input(prompt="> "):
         print("\nВыход из игры.")
         return "quit"
 
+
 def show_inventory(game_state):
     inventory = game_state['player_inventory']
     if inventory:
         print("\nВаш инвентарь:", ", ".join(inventory))
     else:
         print("\nВаш инвентарь пуст.")
+
 
 def move_player(game_state, direction):
     room_name = game_state['current_room']
@@ -27,8 +29,11 @@ def move_player(game_state, direction):
         game_state['steps_taken'] += 1
         print(f"\nВы пошли {direction}...")
         describe_current_room(game_state)
+        # Вызываем случайное событие после перемещения
+        random_event(game_state)
     else:
         print("Нельзя пойти в этом направлении.")
+
 
 def take_item(game_state, item_name):
     room_name = game_state['current_room']
@@ -45,6 +50,7 @@ def take_item(game_state, item_name):
     else:
         print("Такого предмета здесь нет.")
 
+
 def use_item(game_state, item_name):
     if item_name not in game_state['player_inventory']:
         print("У вас нет такого предмета.")
@@ -55,10 +61,12 @@ def use_item(game_state, item_name):
     elif item_name == 'sword':
         print("Вы чувствуете уверенность с мечом в руках.")
     elif item_name == 'bronze_box':
-        if 'rusty_key' not in game_state['player_inventory']:
-            print("Вы открываете бронзовую шкатулку. Внутри лежит ржавый ключ!")
-            game_state['player_inventory'].append('rusty_key')
+        if 'treasure_key' not in game_state['player_inventory']:
+            print("Вы открываете бронзовую шкатулку. Внутри лежит ключ от сокровищ!")
+            game_state['player_inventory'].append('treasure_key')
         else:
             print("Шкатулка пуста.")
+    elif item_name == 'coin':
+        print("Вы подбрасываете монетку... Блестит!")
     else:
         print(f"Вы не знаете, как использовать {item_name}.")

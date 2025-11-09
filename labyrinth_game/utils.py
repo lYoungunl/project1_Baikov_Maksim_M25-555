@@ -1,6 +1,66 @@
 #!/usr/bin/env python3
 
+import math
+
 from .constants import ROOMS
+
+
+def pseudo_random(seed, modulo):
+    """Генерирует псевдослучайное число в диапазоне [0, modulo)"""
+    x = math.sin(seed * 12.9898) * 43758.5453
+    fractional = x - math.floor(x)
+    return int(fractional * modulo)
+
+
+def trigger_trap(game_state):
+    """Активирует ловушку с негативными последствиями"""
+    print("Ловушка активирована! Пол стал дрожать...")
+    
+    inventory = game_state['player_inventory']
+    
+    if inventory:
+        # Случайно выбираем предмет для удаления
+        index = pseudo_random(game_state['steps_taken'], len(inventory))
+        lost_item = inventory.pop(index)
+        print(f"Из вашего инвентаря выпал: {lost_item}")
+    else:
+        # Если инвентарь пуст - проверяем на поражение
+        chance = pseudo_random(game_state['steps_taken'], 10)
+        if chance < 3:
+            print("Вы не удержались и упали в пропасть! Игра окончена.")
+            game_state['game_over'] = True
+        else:
+            print("Вам чудом удалось удержаться!")
+
+
+def random_event(game_state):
+    """Случайные события при перемещении"""
+    # 10% вероятность события
+    if pseudo_random(game_state['steps_taken'], 10) != 0:
+        return
+    
+    event_type = pseudo_random(game_state['steps_taken'] + 1, 3)
+    current_room = game_state['current_room']
+    
+    if event_type == 0:
+        # Находка
+        print("Вы заметили что-то блестящее на полу... Это монетка!")
+        ROOMS[current_room]['items'].append('coin')
+    
+    elif event_type == 1:
+        # Испуг
+        print("Вы слышите подозрительный шорох из темноты...")
+        if 'sword' in game_state['player_inventory']:
+            print("Вы достаете меч, и существо отступает!")
+        else:
+            print("Вы замираете от страха...")
+    
+    elif event_type == 2:
+        # Ловушка
+        if (current_room == 'trap_room' and 
+            'torch' not in game_state['player_inventory']):
+            print("Опасность! Вы не видите ловушку в темноте!")
+            trigger_trap(game_state)
 
 
 def describe_current_room(game_state):
