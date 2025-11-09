@@ -25,7 +25,18 @@ def move_player(game_state, direction):
     room = ROOMS[room_name]
     
     if direction in room['exits']:
-        game_state['current_room'] = room['exits'][direction]
+        next_room = room['exits'][direction]
+        
+        # ПРОВЕРКА ДОСТУПА В TREASURE_ROOM - ИСПРАВЛЕННАЯ ЛОГИКА
+        if next_room == 'treasure_room':
+            if 'treasure_key' not in game_state['player_inventory']:
+                print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
+                return
+            else:
+                print("Вы используете найденный ключ,"
+                      " чтобы открыть путь в комнату сокровищ.")
+        
+        game_state['current_room'] = next_room
         game_state['steps_taken'] += 1
         print(f"\nВы пошли {direction}...")
         describe_current_room(game_state)

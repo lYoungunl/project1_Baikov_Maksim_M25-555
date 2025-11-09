@@ -89,20 +89,39 @@ def solve_puzzle(game_state):
         print("Загадок здесь нет.")
         return
     
-    question, answer = room['puzzle']
+    question, correct_answer = room['puzzle']
     print(f"\nЗагадка: {question}")
     
-    user_answer = input("Ваш ответ: ").strip()
+    user_answer = input("Ваш ответ: ").strip().lower()
     
-    if user_answer.lower() == answer.lower():
+    # Альтернативные варианты ответов
+    alternative_answers = {
+        '10': ['десять', '10', 'ten'],
+        'резонанс': ['резонанс', 'resonance'],
+        'шаг шаг шаг': ['шаг шаг шаг', 'step step step']
+    }
+    
+    correct_answers = alternative_answers.get(correct_answer, [correct_answer])
+    
+    if user_answer in correct_answers:
         print("Верно! Загадка решена!")
         # Убираем загадку из комнаты
         ROOMS[room_name]['puzzle'] = None
-        # Награда за решение загадки
-        if room_name == 'treasure_room':
+        
+        # Награда в зависимости от комнаты
+        if room_name == 'hall':
+            print("Пьедестал опускается, открывая скрытый механизм!")
+        elif room_name == 'trap_room':
+            print("Плиты перестали дрожать. Теперь можно безопасно пройти!")
+        elif room_name == 'library':
+            print("Свиток испускает таинственное свечение!")
+        elif room_name == 'treasure_room':
             attempt_open_treasure(game_state)
     else:
         print("Неверно. Попробуйте снова.")
+        # В trap_room неверный ответ активирует ловушку
+        if room_name == 'trap_room':
+            trigger_trap(game_state)
 
 
 def attempt_open_treasure(game_state):
@@ -131,13 +150,7 @@ def attempt_open_treasure(game_state):
             print("Вы отступаете от сундука.")
 
 
-def show_help():
+def show_help(commands):
     print("\nДоступные команды:")
-    print("  go <direction>  - перейти в направлении (north/south/east/west)")
-    print("  look            - осмотреть текущую комнату")
-    print("  take <item>     - поднять предмет")
-    print("  use <item>      - использовать предмет из инвентаря")
-    print("  inventory       - показать инвентарь")
-    print("  solve           - попытаться решить загадку в комнате")
-    print("  quit            - выйти из игры")
-    print("  help            - показать это сообщение")
+    for cmd, description in commands.items():
+        print(f"  {cmd:<16} - {description}")
